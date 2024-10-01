@@ -97,16 +97,16 @@ func TestFragmentOnly(t *testing.T) {
 	require.False(t, r1.HasFileScheme)
 	require.Equal(t, "/fragment/only", r1.GetPointer().String())
 
-	p, err := jsonpointer.New(r1.referenceURL.Fragment)
+	p, err := jsonpointer.New(r1.ReferenceURL.Fragment)
 	require.NoError(t, err)
 
 	t.Run("Ref with fragmentOnly", func(t *testing.T) {
-		r2 := Ref{referencePointer: p, HasFragmentOnly: true}
+		r2 := Ref{ReferencePointer: p, HasFragmentOnly: true}
 		assert.Equal(t, in, r2.String())
 	})
 
 	t.Run("Ref without fragmentOnly", func(t *testing.T) {
-		r3 := Ref{referencePointer: p, HasFragmentOnly: false}
+		r3 := Ref{ReferencePointer: p, HasFragmentOnly: false}
 		assert.Equal(t, in[1:], r3.String())
 	})
 }
