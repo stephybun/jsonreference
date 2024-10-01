@@ -59,8 +59,8 @@ func MustCreateRef(ref string) Ref {
 
 // Ref represents a json reference object
 type Ref struct {
-	referenceURL     *url.URL
-	referencePointer jsonpointer.Pointer
+	ReferenceURL     *url.URL
+	ReferencePointer jsonpointer.Pointer
 
 	HasFullURL      bool
 	HasURLPathOnly  bool
@@ -69,36 +69,49 @@ type Ref struct {
 	HasFullFilePath bool
 }
 
+func (r *Ref) HasOnlyFragment() bool {
+	if r.ReferenceURL == nil {
+		return false
+	}
+	if r.ReferenceURL.Host != "" {
+		return false
+	}
+	if r.ReferenceURL.Path != "" {
+		return false
+	}
+	return true
+}
+
 // GetURL gets the URL for this reference
 func (r *Ref) GetURL() *url.URL {
-	return r.referenceURL
+	return r.ReferenceURL
 }
 
 // GetPointer gets the json pointer for this reference
 func (r *Ref) GetPointer() *jsonpointer.Pointer {
-	return &r.referencePointer
+	return &r.ReferencePointer
 }
 
 // String returns the best version of the url for this reference
 func (r *Ref) String() string {
 
-	if r.referenceURL != nil {
-		return r.referenceURL.String()
+	if r.ReferenceURL != nil {
+		return r.ReferenceURL.String()
 	}
 
-	if r.HasFragmentOnly {
-		return fragmentRune + r.referencePointer.String()
+	if r.HasOnlyFragment() {
+		return fragmentRune + r.ReferencePointer.String()
 	}
 
-	return r.referencePointer.String()
+	return r.ReferencePointer.String()
 }
 
 // IsRoot returns true if this reference is a root document
 func (r *Ref) IsRoot() bool {
-	return r.referenceURL != nil &&
+	return r.ReferenceURL != nil &&
 		!r.IsCanonical() &&
 		!r.HasURLPathOnly &&
-		r.referenceURL.Fragment == ""
+		r.ReferenceURL.Fragment == ""
 }
 
 // IsCanonical returns true when this pointer starts with http(s):// or file://
@@ -114,8 +127,8 @@ func (r *Ref) parse(jsonReferenceString string) error {
 		return err
 	}
 
-	r.referenceURL, _ = url.Parse(purell.NormalizeURL(parsed, purell.FlagsSafe|purell.FlagRemoveDuplicateSlashes))
-	refURL := r.referenceURL
+	r.ReferenceURL, _ = url.Parse(purell.NormalizeURL(parsed, purell.FlagsSafe|purell.FlagRemoveDuplicateSlashes))
+	refURL := r.ReferenceURL
 
 	if refURL.Scheme != "" && refURL.Host != "" {
 		r.HasFullURL = true
@@ -131,7 +144,7 @@ func (r *Ref) parse(jsonReferenceString string) error {
 	r.HasFullFilePath = strings.HasPrefix(refURL.Path, "/")
 
 	// invalid json-pointer error means url has no json-pointer fragment. simply ignore error
-	r.referencePointer, _ = jsonpointer.New(refURL.Fragment)
+	r.ReferencePointer, _ = jsonpointer.New(refURL.Fragment)
 
 	return nil
 }

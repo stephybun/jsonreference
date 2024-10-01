@@ -150,11 +150,11 @@ func TestFragmentOnly(t *testing.T) {
 		t.Errorf("New(%v)::GetPointer() %v expect %v", in, r1.GetPointer().String(), "/fragment/only")
 	}
 
-	p, _ := jsonpointer.New(r1.referenceURL.Fragment)
-	r2 := Ref{referencePointer: p, HasFragmentOnly: true}
+	p, _ := jsonpointer.New(r1.ReferenceURL.Fragment)
+	r2 := Ref{ReferencePointer: p, HasFragmentOnly: true}
 	assert.Equal(t, r2.String(), in)
 
-	r3 := Ref{referencePointer: p, HasFragmentOnly: false}
+	r3 := Ref{ReferencePointer: p, HasFragmentOnly: false}
 	assert.Equal(t, r3.String(), in[1:])
 }
 
